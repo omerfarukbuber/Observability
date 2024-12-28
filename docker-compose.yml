@@ -1,0 +1,26 @@
+services:
+  observability.mongo:
+    restart: always
+    image: mongo
+    container_name: mongo.db.observability
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    ports:
+      - "27030:27017"
+    volumes:
+      - mongo.db.observability.volume:/data/db
+  observability.mongo.ui:
+    restart: always
+    image: mongo-express
+    container_name: mongo.db.observability.ui
+    ports:
+      - "27032:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo.db.observability:27017/
+      ME_CONFIG_BASICAUTH: false
+
+volumes:
+  mongo.db.observability.volume:
+
+
