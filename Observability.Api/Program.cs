@@ -2,6 +2,7 @@ using Observability.Api;
 using Observability.Api.Extensions;
 using Observability.Application;
 using Observability.Infrastructure;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
 
+builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -17,6 +20,8 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 
 app.MapEndpoints();
+
+app.UseSerilogRequestLogging();
 
 app.ConfigureCustomResult();
 app.ConfigureExceptionHandlers();
