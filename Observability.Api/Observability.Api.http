@@ -1,11 +1,12 @@
-@baseUrl = http://localhost:5000
+@apiVersion = 1
+@baseUrl = http://localhost:5000/api/v{{apiVersion}}
 
 ### Register User
 POST {{baseUrl}}/users/register
 Content-Type: application/json
 
 {
-  "email": "user@example.com",
+  "email": "johndoe@example.com",
   "firstName": "John",
   "lastName": "Doe",
   "password": "password123"
