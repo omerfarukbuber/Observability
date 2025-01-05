@@ -2,7 +2,7 @@ services:
   observability.mongo:
     restart: always
     image: mongo
-    container_name: mongo.db.observability
+    container_name: observability.mongo.db
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
@@ -13,14 +13,21 @@ services:
   observability.mongo.ui:
     restart: always
     image: mongo-express
-    container_name: mongo.db.observability.ui
+    container_name: observability.mongo.db.ui
     ports:
       - "27032:8081"
     environment:
       ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo.db.observability:27017/
       ME_CONFIG_BASICAUTH: false
 
+  seq:
+    image: datalust/seq:latest
+    container_name: observability.seq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5341:5341
+      - 8081:80
+
 volumes:
   mongo.db.observability.volume:
-
-
