@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Observability.Application.Abstractions.Authentication;
 using Observability.Application.Abstractions.Data;
+using Observability.Infrastructure.Authentication;
 using Observability.Infrastructure.Database;
 
 namespace Observability.Infrastructure;
@@ -12,7 +14,8 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services,
         IConfiguration configuration) =>
         services.AddDatabase(configuration)
-            .AddHealthChecks(configuration);
+            .AddHealthChecks(configuration)
+            .AddServices();
 
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
@@ -36,6 +39,12 @@ public static class DependencyInjection
     {
         services.AddHealthChecks()
             .AddSqlServer(configuration.GetConnectionString("SqlServer")!);
+        return services;
+    }
+
+    private static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IPasswordHasher, PasswordHasher>();
         return services;
     }
 
