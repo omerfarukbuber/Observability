@@ -1,7 +1,7 @@
-﻿using Observability.Api.Extensions;
+﻿using Asp.Versioning;
+using Observability.Api.Extensions;
 using Observability.Api.Infrastructure;
 using System.Reflection;
-using Asp.Versioning;
 
 namespace Observability.Api;
 
@@ -26,13 +26,8 @@ internal static class DependencyInjection
 
         services.AddHttpContextAccessor();
         services.AddOpenApi();
-        
-        return services;
-    }
 
-    public static void ConfigureExceptionHandlers(this IApplicationBuilder app)
-    {
-        app.UseExceptionHandler();
+        return services;
     }
 
     private static IServiceCollection AddExceptionServices(this IServiceCollection services)
@@ -48,5 +43,10 @@ internal static class DependencyInjection
         });
         services.AddExceptionHandler<GlobalExceptionHandler>();
         return services;
+    }
+
+    public static void ConfigureExceptionHandlers(this IApplicationBuilder app)
+    {
+        app.UseExceptionHandler();
     }
 }
