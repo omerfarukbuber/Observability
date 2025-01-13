@@ -2,6 +2,7 @@ using Observability.Api;
 using Observability.Api.Extensions;
 using Observability.Application;
 using Observability.Infrastructure;
+using OpenTelemetry.Logs;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
 
+builder.Logging.AddOpenTelemetry(logging => logging.AddOtlpExporter());
 builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 
 // Add services to the container.

@@ -28,6 +28,12 @@ services:
     ports:
       - 5341:5341
       - 8081:80
-
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: observability.jaeger
+    ports:
+      - 16686:16686
+      - 4317:4317
+      - 4318:4318
 volumes:
   mongo.db.observability.volume:
