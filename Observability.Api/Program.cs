@@ -3,6 +3,7 @@ using Observability.Api.Extensions;
 using Observability.Application;
 using Observability.Infrastructure;
 using OpenTelemetry.Logs;
+using Scalar.AspNetCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,8 @@ app.ConfigureExceptionHandlers();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
+
     await app.ApplyMigration();
 }
 
