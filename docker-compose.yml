@@ -1,26 +1,89 @@
 services:
-  observability.mongo:
-    restart: always
-    image: mongo
-    container_name: mongo.db.observability
+  # observability.mongo:
+  #   restart: always
+  #   image: mongo
+  #   container_name: observability.mongo.db
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+  #   ports:
+  #     - "27030:27017"
+  #   volumes:
+  #     - mongo.db.observability.volume:/data/db
+
+  # observability.mongo.ui:
+  #   restart: always
+  #   image: mongo-express
+  #   container_name: observability.mongo.db.ui
+  #   ports:
+  #     - "27032:8081"
+  #   environment:
+  #     ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo.db.observability:27017/
+  #     ME_CONFIG_BASICAUTH: false
+
+  observability.sql.server:
+    image: mcr.microsoft.com/mssql/server
+    container_name: observability.sql.server
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      SA_PASSWORD: ${SQL_PASSWORD}
+      ACCEPT_EULA: Y
     ports:
-      - "27030:27017"
+      - "1433:1433"
+    networks:
+      - observability
     volumes:
-      - mongo.db.observability.volume:/data/db
-  observability.mongo.ui:
-    restart: always
-    image: mongo-express
-    container_name: mongo.db.observability.ui
+      - observability.sql.server.volume:/data/db
+
+  observability.api:
+    image: ${DOCKER_REGISTRY-}observability.api
+    container_name: observability.api
+    depends_on:
+      - observability.sql.server
+    build:
+      context: .
+      dockerfile: Observability.Api/Dockerfile
     ports:
-      - "27032:8081"
+      - 8080:8080
     environment:
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo.db.observability:27017/
-      ME_CONFIG_BASICAUTH: false
+      - ASPNETCORE_ENVIRONMENT=Development
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://observability.dashboard:18889
+      - "ConnectionStrings__SqlServer=Server=observability.sql.server,1433;Database=Observability;User Id=sa;Password=${SQL_PASSWORD};TrustServerCertificate=True;"
+
+    networks:
+      - observability
+
+  # seq:
+  #   image: datalust/seq:latest
+  #   container_name: observability.seq
+  #   environment:
+  #     - ACCEPT_EULA=Y
+  #   ports:
+  #     - 5341:5341
+  #     - 8081:80
+  #   networks:
+  #     - observability
+
+  # jaeger:
+  #   image: jaegertracing/all-in-one:latest
+  #   container_name: observability.jaeger
+  #   ports:
+  #     - 16686:16686
+  #     - 4317:4317
+  #     - 4318:4318
+  #   networks:
+  #     - observability
+
+  observability.dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard
+    container_name: observability.dashboard
+    ports:
+      - 18888:18888
+    networks:
+      - observability
 
 volumes:
   mongo.db.observability.volume:
-
-
+  observability.sql.server.volume:
+  
+networks:
+  observability:

@@ -15,6 +15,7 @@ internal class UserEndpoints : IEndpoint
 
         app.MapGroup(BaseAddress)
             .RegisterUserEndpoint()
+            .LoginUserEndpoint()
             .WithApiVersionSet(apiVersionSet);
     }
 }
