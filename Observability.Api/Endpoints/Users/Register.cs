@@ -11,7 +11,7 @@ internal static class Register
     private sealed record Request(string Email, string FirstName, string LastName, string Password);
     internal static RouteGroupBuilder RegisterUserEndpoint(this RouteGroupBuilder app)
     {
-        app.MapPost("/",
+        app.MapPost("/register",
             async (Request request, ISender sender, CancellationToken cancellationToken = default) =>
             {
                 var command = new RegisterUserCommand(request.Email,
