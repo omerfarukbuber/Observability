@@ -33,9 +33,9 @@ app.ConfigureExceptionHandlers();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();
+    
 
     await app.ApplyMigration();
 }
-
+app.MapScalarApiReference();
 app.Run();
