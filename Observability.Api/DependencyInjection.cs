@@ -5,6 +5,8 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Reflection;
+using Serilog;
+using Serilog.Exceptions;
 
 namespace Observability.Api;
 
@@ -96,5 +98,26 @@ internal static class DependencyInjection
     public static void ConfigureExceptionHandlers(this IApplicationBuilder app)
     {
         app.UseExceptionHandler();
+    }
+
+    public static IHostBuilder ConfigureLogging(this IHostBuilder host)
+    {
+        host.UseSerilog((context, loggerConfiguration) =>
+        {
+            var env = context.HostingEnvironment;
+            const string envName = "EnvironmentName";
+            const string appName = "ApplicationName";
+
+            loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+            loggerConfiguration
+                .Enrich.FromLogContext()
+                .Enrich.WithExceptionDetails()
+                .Enrich.WithProperty(envName, env.EnvironmentName)
+                .Enrich.WithProperty(appName, env.ApplicationName);
+
+            loggerConfiguration.WriteTo.Console();
+        });
+
+        return host;
     }
 }
