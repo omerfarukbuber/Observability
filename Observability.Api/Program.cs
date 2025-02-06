@@ -13,8 +13,9 @@ builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
 
+builder.Host.ConfigureLogging();
+
 builder.Logging.AddOpenTelemetry(logging => logging.AddOtlpExporter());
-builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
